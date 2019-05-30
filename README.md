@@ -84,6 +84,29 @@ $ systemctl daemon-reload
 $ systemctl enable gardena2influxdb.service
 $ systemctl start gardena2influxdb.service
 ```
+Optional Setup - Configure logrotation for gardena2influxdb.service
+1) Edit **/etc/rsyslog.d/50-default.conf** and append the following ling
+```
+:programname,isequal,"gardena2influxdb"         /var/log/gardena2influxdb.log
+```
+2) Restart Rsyslog-Daemon for changes to take effect
+```
+systemctl restart rsyslog
+```
+3) Configure logrotation for gardena2influxdb.log in `/etc/logrotate.d/gardena2influxdb`
+```
+/var/log/gardena2influxdb.log { 
+    su root syslog
+    daily
+    rotate 5
+    compress
+    delaycompress
+    missingok
+    postrotate
+        systemctl restart rsyslog > /dev/null
+    endscript    
+}
+```
 
 After the first events will go to the InfluxDB you can create nice Grafana dashboards.
 
