@@ -1,8 +1,11 @@
 # Gardena2InfluxDB
 ### Version 0.1
+![Alt text](https://github.com/sorny/gardena2influxdb/blob/master/gardena2influxdb.png?raw=true "Grafana dashboard example")
 
 Gardena2InfluxDB is a Python script for parsing events received on a GARDENA smart system websocket. 
 Events are then parsed and forwarded to InfluxDB to create fancy charts and dashboards on e.g. sensor reading history
+
+
 
 # Main Features:
 
