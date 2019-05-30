@@ -5,7 +5,7 @@ Conflicts=getty@tty1.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /usr/bin/gardena2influxdb.py
+ExecStart=/usr/bin/python3 /root/gardena2influxdb/gardena2influxdb.py
 StandardInput=tty-force
 Restart=always
 RestartSec=2
