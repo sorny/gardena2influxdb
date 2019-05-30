@@ -77,10 +77,10 @@ $ pip3 install -r requirements.txt
 $ cp settings.ini.bak settings.ini
 $ vi settings.ini
 $ cp gardena2influxdb.service.template /lib/systemd/system/gardena2influxdb.service
-$ cp gardena2influxdb.py /usr/bin
 ```
 4) Then enable and start service
 ```sh
+$ systemctl daemon-reload
 $ systemctl enable gardena2influxdb.service
 $ systemctl start gardena2influxdb.service
 ```
