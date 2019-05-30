@@ -6,9 +6,6 @@ password =
 # Unique application key from developer.1689.cloud/apps
 application_api_key = 
 
-# Configured gateway timezone to normalize event timestamps
-gateway_timezone = Europe/Zurich
-
 # Endpoints for authentcation and GARDENA smart system events
 authentication_endpoint = https://api.authentication.husqvarnagroup.dev
 gardena_api_endpoint = https://api.smart.gardena.dev

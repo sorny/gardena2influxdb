@@ -7,27 +7,27 @@ import os
 import sys
 import time
 import json
-import pytz
 import requests
 import websocket
 import configparser
 import dateutil.parser
+from datetime import datetime
 from threading import Thread
 from influxdb import InfluxDBClient
 
 
 class Client:
-    def __init__(self, idb, timezone):
+    def __init__(self, idb):
         self.idb = idb
-        self.timezone = timezone
 
     def on_message(self, message):
         print("msg", message)
         sys.stdout.flush()
 
         # Parse and reading point as JSON data to InfluxDB
-        influxdata = eventparse(message, self.timezone)
-        self.idb.write_points(influxdata)
+        influxdata = eventparse(message)
+        if influxdata:
+            self.idb.write_points(influxdata)
 
     def on_error(self, error):
         print("error", error)
@@ -48,50 +48,59 @@ class Client:
 
         Thread(target=run).start()
 
-def eventparse(message, timezone):
-    # Process event data
-    # If an attribute contains a timestamp, we will use that one as data creation timestamp
-    iso = time.ctime()
-    data = json.loads(message)
-    device_id = data["id"]
-    event_type = data["type"]
-    influxdata = []
 
-    event_attributes = data["attributes"]
-    for event_attribute in event_attributes:
-        influx_event = {
-            "measurement": device_id,
-            "tags": {
-                "event_type": event_type
-            },
-            "fields": {
+def eventparse(message):
+    try:
+        # Process event data
+        # If an attribute contains a timestamp, we will use that one as data creation timestamp
+        iso = datetime.utcnow().ctime()
+        data = json.loads(message)
+        device_id = data["id"]
+        event_type = data["type"]
+        influxdata = []
+
+        # Ignore LOCATION and DEVICE type events as they contain no statistic data
+        if (event_type == "LOCATION") or (event_type == "DEVICE"):
+            return
+
+        event_attributes = data["attributes"]
+        for event_attribute in event_attributes:
+            influx_event = {
+                "measurement": device_id,
+                "tags": {
+                    "event_type": event_type
+                },
+                "fields": {
+                }
             }
-        }
 
-        # event timestamp handling
-        try:
-            if event_attributes[event_attribute]["timestamp"]:
-                # Parse and convert to timezone of Gateway
-                parsed_date = dateutil.parser.parse(event_attributes[event_attribute]["timestamp"])
-                influx_event["time"] = parsed_date.astimezone(timezone).ctime()
+            # event timestamp handling
+            try:
+                if event_attributes[event_attribute]["timestamp"]:
+                    parsed_date = dateutil.parser.parse(event_attributes[event_attribute]["timestamp"])
+                    influx_event["time"] = parsed_date.ctime()
 
-        except KeyError:
-            influx_event["time"] = iso
+            except KeyError:
+                influx_event["time"] = iso
 
-        # event field value handling
-        event_field_value = event_attributes[event_attribute]["value"]
+            # event field value handling
+            event_field_value = event_attributes[event_attribute]["value"]
 
-        # convert ONLINE/OFFLINE to boolean
-        if event_attribute == "rfLinkState":
-            if event_field_value == "ONLINE":
-                event_field_value = 1
-            else:
-                event_field_value = 0
+            # convert ONLINE/OFFLINE to boolean
+            if event_attribute == "rfLinkState":
+                if event_field_value == "ONLINE":
+                    event_field_value = 1
+                else:
+                    event_field_value = 0
 
-        influx_event["fields"][event_attribute] = event_field_value
-        influxdata.append(influx_event)
+            influx_event["fields"][event_attribute] = event_field_value
+            influxdata.append(influx_event)
 
-    return influxdata
+        return influxdata
+
+    except Exception as e:
+        print("Exception", e)
+        return
 
 
 def main():
@@ -110,14 +119,12 @@ def main():
     USERNAME = CONFIG.get('GARDENA', 'username')
     PASSWORD = CONFIG.get('GARDENA', 'password')
     API_KEY = CONFIG.get('GARDENA', 'application_api_key')
-    GATEWAY_TIMEZONE = CONFIG.get('GARDENA', 'gateway_timezone')
 
     AUTHENTICATION_ENDPOINT = CONFIG.get('GARDENA', 'authentication_endpoint')
     GARDENA_API_ENDPOINT = CONFIG.get('GARDENA', 'gardena_api_endpoint')
 
     # Setup InfluxDB client
     idb = InfluxDBClient(INFLUX_HOST, INFLUX_PORT, INFLUX_USER, INFLUX_PASSWORD, INFLUX_DB)
-    timezone = pytz.timezone(GATEWAY_TIMEZONE)
 
     # Authenticate and connect to Gardena Websocket Endpoint
     payload = {'grant_type': 'password', 'username': USERNAME, 'password': PASSWORD,
@@ -158,7 +165,7 @@ def main():
     websocket_url = response["data"]["attributes"]["url"]
 
     # websocket.enableTrace(True)
-    client = Client(idb, timezone)
+    client = Client(idb)
     ws = websocket.WebSocketApp(
         websocket_url,
         on_message=client.on_message,
