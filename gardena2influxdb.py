@@ -1,5 +1,4 @@
-#! /usr/bin/env python
-
+#!/usr/bin/python3 -u
 # Parsing GARDENA smart system events and forwarding it InfluxDB
 # Gerald Reisinger 2019
 
