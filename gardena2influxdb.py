@@ -7,6 +7,7 @@ import sys
 import time
 import json
 import requests
+import traceback
 import websocket
 import configparser
 import dateutil.parser
@@ -26,6 +27,7 @@ class Client:
         # Parse and reading point as JSON data to InfluxDB
         influxdata = eventparse(message)
         if influxdata:
+            print("influxdata", influxdata)
             self.idb.write_points(influxdata)
 
     def on_error(self, error):
@@ -101,6 +103,7 @@ def eventparse(message):
 
     except Exception as e:
         print("Exception", e)
+        print(traceback.format_exc())
         return
 
 
