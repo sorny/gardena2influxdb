@@ -70,15 +70,14 @@ Gardena2InfluxDB uses open source libs and open data to work properly:
 2) Clone the repository, create environment and install requirements
 ```sh
 $ cd gardena2influxdb
-$ virtualenv venv && source venv/bin/activate
-$ pip install -r requirements.txt
+$ pip3 install -r requirements.txt
 ```
 3) Modify **settings.ini** & **gardena2influxdb.service** files and copy service to systemd.
 ```sh
 $ cp settings.ini.bak settings.ini
 $ vi settings.ini
-$ cp gardena2influxdb.service.template gardena2influxdb.service
-$ cp gardena2influxdb.service /lib/systemd/system/
+$ cp gardena2influxdb.service.template /lib/systemd/system/gardena2influxdb.service
+$ cp gardena2influxdb.py /usr/bin
 ```
 4) Then enable and start service
 ```sh
