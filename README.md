@@ -93,7 +93,7 @@ Optional Setup - Configure logrotation for gardena2influxdb.service
 ```
 systemctl restart rsyslog
 ```
-3) Configure logrotation for gardena2influxdb.log in `/etc/logrotate.d/gardena2influxdb`
+3) Configure logrotation for gardena2influxdb.log by creating `/etc/logrotate.d/gardena2influxdb` with the following content
 ```
 /var/log/gardena2influxdb.log { 
     su root syslog
