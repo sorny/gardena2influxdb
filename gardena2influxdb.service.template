@@ -1,0 +1,15 @@
+[Unit]
+Description=Gardena2InfluxDB
+After=multi-user.target
+Conflicts=getty@tty1.service
+
+[Service]
+Type=simple
+ExecStart=$PWD/venv/bin/python gardena2influxdb.py
+User=root
+WorkingDirectory=$PWD
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
