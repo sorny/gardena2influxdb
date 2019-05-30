@@ -67,9 +67,9 @@ Gardena2InfluxDB uses open source libs and open data to work properly:
 # Installation
 1) Goto https://developer.1689.cloud/, sign in using your GARDENA smart system account and create a new application
 2) Connect GARDENA smart system API and Authentication API to your application
-2) Clone the repository, create environment and install requirements
+2) Clone the repository to `/etc` install requirements
 ```sh
-$ cd gardena2influxdb
+$ cd /etc/gardena2influxdb
 $ pip3 install -r requirements.txt
 ```
 3) Modify **settings.ini** & **gardena2influxdb.service** files and copy service to systemd.
