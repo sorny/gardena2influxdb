@@ -5,9 +5,8 @@ Conflicts=getty@tty1.service
 
 [Service]
 Type=simple
-ExecStart=$PWD/venv/bin/python gardena2influxdb.py
-User=root
-WorkingDirectory=$PWD
+ExecStart=/usr/bin/python3 /usr/bin/gardena2influxdb.py
+StandardInput=tty-force
 Restart=always
 RestartSec=2
 
