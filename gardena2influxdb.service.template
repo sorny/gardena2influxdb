@@ -1,14 +1,17 @@
 [Unit]
 Description=Gardena2InfluxDB
-After=multi-user.target
-Conflicts=getty@tty1.service
+After=syslog.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /root/gardena2influxdb/gardena2influxdb.py
-StandardInput=tty-force
+User=root
+WorkingDirectory=/etc/gardena2influxdb
+ExecStart=/etc/gardena2influxdb/gardena2influxdb.py
+SyslogIdentifier=gardena2influxdb
+StandardOutput=syslog
+StandardError=syslog
 Restart=always
-RestartSec=2
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
