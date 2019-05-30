@@ -30,6 +30,8 @@ class Client:
 
     def on_error(self, error):
         print("error", error)
+        print("### exit ###")
+        sys.exit(-1)
 
     def on_close(self):
         self.live = False
