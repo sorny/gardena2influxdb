@@ -2,17 +2,18 @@
 # Parsing GARDENA smart system events and forwarding it InfluxDB
 # Gerald Reisinger 2019
 
+import configparser
+import json
 import os
 import sys
 import time
-import json
-import requests
 import traceback
-import websocket
-import configparser
-import dateutil.parser
 from datetime import datetime
 from threading import Thread
+
+import dateutil.parser
+import requests
+import websocket
 from influxdb import InfluxDBClient
 
 
@@ -31,9 +32,10 @@ class Client:
             self.idb.write_points(influxdata)
 
     def on_error(self, error):
+        self.live = False
         print("error", error)
         print("### exit ###")
-        sys.exit(-1)
+        sys.exit(0)
 
     def on_close(self):
         self.live = False
@@ -43,13 +45,13 @@ class Client:
     def on_open(self):
         print("### connected ###")
 
-        self.live = True
+    self.live = True
 
-        def run(*args):
-            while self.live:
-                time.sleep(1)
+    def run(*args):
+        while self.live:
+            time.sleep(1)
 
-        Thread(target=run).start()
+    Thread(target=run).start()
 
 
 def eventparse(message):
@@ -95,6 +97,13 @@ def eventparse(message):
                     event_field_value = 1
                 else:
                     event_field_value = 0
+
+            # add 0 duration event in case device activity is set to "OFF"
+            if event_attribute == "activity":
+                if event_field_value == "OFF":
+                    influx_event["fields"]["duration"] = 0
+
+            # store event field data
 
             influx_event["fields"][event_attribute] = event_field_value
             influxdata.append(influx_event)
