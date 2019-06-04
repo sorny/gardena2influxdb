@@ -43,9 +43,8 @@ class Client:
         sys.exit(0)
 
     def on_open(self):
+        self.live = True
         print("### connected ###")
-
-    self.live = True
 
     def run(*args):
         while self.live:
