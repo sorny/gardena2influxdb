@@ -46,11 +46,11 @@ class Client:
         self.live = True
         print("### connected ###")
 
-    def run(*args):
-        while self.live:
-            time.sleep(1)
+        def run(*args):
+            while self.live:
+                time.sleep(1)
 
-    Thread(target=run).start()
+        Thread(target=run).start()
 
 
 def eventparse(message):
