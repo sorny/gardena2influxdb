@@ -85,7 +85,7 @@ def parse_event(message, kvdb):
         if kvdb.exists(device_id):
             device_pretty_name = kvdb.get(device_id)
         else:
-            print("Skipped event since pretty name is missing...")
+            print(f'Skipped event since pretty name is missing for {device_id} ...')
             return
 
         event_attributes = data["attributes"]
