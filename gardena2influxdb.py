@@ -140,6 +140,9 @@ def parse_event(message, kvdb):
 def main():
     # Preparing for reading config file
     PWD = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+    if not os.path.isfile('%s/settings.ini' % PWD):
+        print("settings.ini does not exist, exiting...")
+        sys.exit(-1)
     CONFIG = configparser.ConfigParser()
     CONFIG.read('%s/settings.ini' % PWD)
 
