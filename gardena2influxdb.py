@@ -57,7 +57,7 @@ class Client:
 
 def store_pretty_name(data, kvdb):
     device_id = data["id"]
-    device_type = data["attributes"]["name"]["value"].lower()
+    device_type = data["attributes"]["modelType"]["value"].replace("GARDENA smart ", "").replace(" ", "-").lower()
     device_serial = data["attributes"]["serial"]["value"]
     device_pretty_name = device_type + "-" + device_serial
     kvdb.set(device_id, device_pretty_name)
