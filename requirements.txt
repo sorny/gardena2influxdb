@@ -1,3 +1,4 @@
 configparser
 websocket-client
 influxdb
+pickledb

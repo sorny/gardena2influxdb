@@ -12,21 +12,23 @@ from datetime import datetime
 from threading import Thread
 
 import dateutil.parser
+import pickledb
 import requests
 import websocket
 from influxdb import InfluxDBClient
 
 
 class Client:
-    def __init__(self, idb):
+    def __init__(self, idb, kvdb):
         self.idb = idb
+        self.kvdb = kvdb
 
     def on_message(self, message):
         print("msg", message)
         sys.stdout.flush()
 
         # Parse and reading point as JSON data to InfluxDB
-        influxdata = eventparse(message)
+        influxdata = parse_event(message, self.kvdb)
         if influxdata:
             print("influxdata", influxdata)
             self.idb.write_points(influxdata)
@@ -51,9 +53,12 @@ class Client:
                 time.sleep(1)
 
         Thread(target=run).start()
+<<<<<<< HEAD
+=======
 
+>>>>>>> Implemented making use of Oauth2 refresh_token and pretty device names
 
-def eventparse(message):
+def parse_event(message, kvdb):
     try:
         # Process event data
         # If an attribute contains a timestamp, we will use that one as data creation timestamp
@@ -63,16 +68,31 @@ def eventparse(message):
         event_type = data["type"]
         influxdata = []
 
-        # Ignore LOCATION and DEVICE type events as they contain no statistic data
+        # LOCATION and DEVICE type events are not forwareded to influx as they contain no statistic data
         if (event_type == "LOCATION") or (event_type == "DEVICE"):
+            return
+
+        # COMMON events are used to generat pretty names for device ids to ease traceability in influx
+        if event_type == "COMMON":
+            device_type = data["attributes"]["name"]["value"].lower()
+            device_serial = data["attributes"]["serial"]["value"]
+            device_pretty_name = device_type + "-" + device_serial
+            kvdb.set(device_id, device_pretty_name)
+
+        # Skip events as long as we have no pretty name
+        if kvdb.exists(device_id):
+            device_pretty_name = kvdb.get(device_id)
+        else:
+            print("Skipped event since pretty name is missing...")
             return
 
         event_attributes = data["attributes"]
         for event_attribute in event_attributes:
             influx_event = {
-                "measurement": device_id,
+                "measurement": device_pretty_name,
                 "tags": {
-                    "event_type": event_type
+                    "event_type": event_type,
+                    "device_id": device_id
                 },
                 "fields": {
                 }
@@ -138,14 +158,27 @@ def main():
     # Setup InfluxDB client
     idb = InfluxDBClient(INFLUX_HOST, INFLUX_PORT, INFLUX_USER, INFLUX_PASSWORD, INFLUX_DB)
 
-    # Authenticate and connect to Gardena Websocket Endpoint
-    payload = {'grant_type': 'password', 'username': USERNAME, 'password': PASSWORD,
-               'client_id': API_KEY}
+    # Setup key-value store
+    kvdb = pickledb.load(PWD + '/gardena2influxdb.db', True)
+    print("Kvdb content...")
+    for kv in kvdb.getall():
+        print(kv, kvdb.get(kv))
+
+    # Authenticate and connect to Gardena Websocket Endpoint, use refresh_token if possible
+    if kvdb.exists('refresh_token'):
+        payload = {'grant_type': 'refresh_token', 'refresh_token': kvdb.get('refresh_token'),
+                   'client_id': API_KEY}
+    else:
+        payload = {'grant_type': 'password', 'username': USERNAME, 'password': PASSWORD,
+                   'client_id': API_KEY}
 
     print("Logging into authentication system...")
     r = requests.post(f'{AUTHENTICATION_ENDPOINT}/v1/oauth2/token', data=payload)
+    if kvdb.exists('refresh_token'):
+        kvdb.rem('refresh_token')
     assert r.status_code == 200, r
     auth_token = r.json()["access_token"]
+    kvdb.set('refresh_token', r.json()["refresh_token"])
 
     headers = {
         "Content-Type": "application/vnd.api+json",
@@ -177,7 +210,7 @@ def main():
     websocket_url = response["data"]["attributes"]["url"]
 
     # websocket.enableTrace(True)
-    client = Client(idb)
+    client = Client(idb, kvdb)
     ws = websocket.WebSocketApp(
         websocket_url,
         on_message=client.on_message,
@@ -192,3 +225,4 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         sys.exit(0)
+
