@@ -55,6 +55,14 @@ class Client:
         Thread(target=run).start()
 
 
+def store_pretty_name(data, kvdb):
+    device_id = data["id"]
+    device_type = data["attributes"]["name"]["value"].lower()
+    device_serial = data["attributes"]["serial"]["value"]
+    device_pretty_name = device_type + "-" + device_serial
+    kvdb.set(device_id, device_pretty_name)
+
+
 def parse_event(message, kvdb):
     try:
         # Process event data
@@ -71,10 +79,7 @@ def parse_event(message, kvdb):
 
         # COMMON events are used to generat pretty names for device ids to ease traceability in influx
         if event_type == "COMMON":
-            device_type = data["attributes"]["name"]["value"].lower()
-            device_serial = data["attributes"]["serial"]["value"]
-            device_pretty_name = device_type + "-" + device_serial
-            kvdb.set(device_id, device_pretty_name)
+            store_pretty_name(data, kvdb)
 
         # Skip events as long as we have no pretty name
         if kvdb.exists(device_id):
@@ -163,13 +168,14 @@ def main():
 
     # Authenticate and connect to Gardena Websocket Endpoint, use refresh_token if possible
     if kvdb.exists('refresh_token'):
+        print("Logging into authentication system using refresh_token...")
         payload = {'grant_type': 'refresh_token', 'refresh_token': kvdb.get('refresh_token'),
                    'client_id': API_KEY}
     else:
+        print("Logging into authentication system using username/password...")
         payload = {'grant_type': 'password', 'username': USERNAME, 'password': PASSWORD,
                    'client_id': API_KEY}
 
-    print("Logging into authentication system...")
     r = requests.post(f'{AUTHENTICATION_ENDPOINT}/v1/oauth2/token', data=payload)
     if kvdb.exists('refresh_token'):
         kvdb.rem('refresh_token')
@@ -188,6 +194,13 @@ def main():
     assert r.status_code == 200, r
     assert len(r.json()["data"]) > 0, 'location missing - user has not setup system'
     location_id = r.json()["data"][0]["id"]
+
+    # Generate pretty names for the devices based on serial
+    r = requests.get(f'{GARDENA_API_ENDPOINT}/v1/locations/{location_id}', headers=headers)
+    assert r.status_code == 200, r
+    for content in r.json()["included"]:
+        if content["type"] == "COMMON":
+            store_pretty_name(content, kvdb)
 
     payload = {
         "data": {
