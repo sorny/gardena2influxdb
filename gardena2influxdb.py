@@ -53,10 +53,7 @@ class Client:
                 time.sleep(1)
 
         Thread(target=run).start()
-<<<<<<< HEAD
-=======
 
->>>>>>> Implemented making use of Oauth2 refresh_token and pretty device names
 
 def parse_event(message, kvdb):
     try:
