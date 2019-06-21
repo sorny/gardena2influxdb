@@ -69,7 +69,7 @@ def parse_event(message, kvdb):
         # If an attribute contains a timestamp, we will use that one as data creation timestamp
         iso = datetime.utcnow().ctime()
         data = json.loads(message)
-        device_id = data["id"]
+        device_id = data["id"].split(":")[0]
         event_type = data["type"]
         influxdata = []
 
