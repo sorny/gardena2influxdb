@@ -163,6 +163,13 @@ def main():
     # Setup InfluxDB client
     idb = InfluxDBClient(INFLUX_HOST, INFLUX_PORT, INFLUX_USER, INFLUX_PASSWORD, INFLUX_DB)
 
+    # Create InfluxDB db if it does not exist yet
+    try:
+        print('Create Influxdb database...')
+        idb.create_database(INFLUX_DB)
+    except influxdb.InfluxDBClientError:
+        print('Influxdb database already exists')
+
     # Setup key-value store
     kvdb = pickledb.load(PWD + '/gardena2influxdb.db', True)
     print("Kvdb content...")

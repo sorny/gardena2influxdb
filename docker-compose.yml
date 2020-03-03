@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+  tig:
+    networks:
+      gardena:
+    image: philhawthorne/docker-influxdb-grafana:latest
+    container_name: tig
+    restart: always
+    ports:
+      - "3003:3003"
+      - "3004:8083"
+      - "8086:8086"
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      - ./data/influxdb:/var/lib/influxdb
+
+  gardena2influxdb:
+    networks:
+      gardena:
+    image: gardena2influxdb:latest
+    container_name: gardena2influxdb
+    restart: always
+    volumes:
+      - ./settings.ini:/app/settings.ini
+      - ./gardena2influxdb.db:/app/gardena2influxdb.db
+    depends_on:
+      - tig
+    command: ["wait-for-it", "tig:8086", "--", "python", "/app/gardena2influxdb.py"]
+
+networks:
+  gardena:
+    driver: bridge

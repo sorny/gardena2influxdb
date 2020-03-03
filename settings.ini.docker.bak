@@ -12,9 +12,9 @@ gardena_api_endpoint = https://api.smart.gardena.dev
 
 [INFLUXDB]
 # Database URL
-host = ip_address
+host = tig
 port = 8086
-database = 
+database = gardena
 
 # Database Auth
 username = 
