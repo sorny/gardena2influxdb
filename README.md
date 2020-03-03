@@ -74,7 +74,8 @@ Gardena2InfluxDB uses open source libs and open data to work properly:
 * [docker-influxdb-grafana](https://github.com/philhawthorne/docker-influxdb-grafana) - A Docker container which runs InfluxDB and Grafana ready for persisting data.
 
 
-# Installation - The docker-composy way of life - Gardena2InfluxDB, Grafana and InfluxDB in docker
+# Installation - The docker-composy way of life
+## Gardena2InfluxDB, Grafana and InfluxDB in docker
 1) Goto https://developer.1689.cloud/, sign in using your GARDENA smart system account and create a new application
 2) Connect GARDENA smart system API and Authentication API to your application
 3) Have `docker` and `docker-compose` installed on your host
@@ -98,7 +99,8 @@ $ docker-compose up
 8) Enjoy Grafana at http://localhost:3003
 
 
-# Installation - The docker way of life - Dockerized Gardena2InfluxDB
+# Installation - The docker way of life
+## Dockerized Gardena2InfluxDB
 1) Goto https://developer.1689.cloud/, sign in using your GARDENA smart system account and create a new application
 2) Connect GARDENA smart system API and Authentication API to your application
 3) Have `docker` installed, InfluxDB is running at some place only you know ;)
@@ -122,7 +124,8 @@ $ docker run -d \
 ```
 
 
-# Installation - The systemctl way of life - Gardena2InfluxDB as a service
+# Installation - The systemctl way of life
+## Gardena2InfluxDB as a service
 1) Goto https://developer.1689.cloud/, sign in using your GARDENA smart system account and create a new application
 2) Connect GARDENA smart system API and Authentication API to your application
 3) Clone the repository to `/etc` and install requirements
