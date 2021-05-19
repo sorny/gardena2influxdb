@@ -114,6 +114,7 @@ $ vi settings.ini
 ```
 6) Build the gardena2influxdb docker image
 ```sh
+$ mkdir -p data/gardena2influxdb
 $ docker build -t gardena2influxdb .
 ```
 7) Run gardena2influxdb docker image
