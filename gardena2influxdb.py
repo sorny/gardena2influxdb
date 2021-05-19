@@ -171,7 +171,7 @@ def main():
         print('Influxdb database already exists')
 
     # Setup key-value store
-    kvdb = pickledb.load(PWD + '/gardena2influxdb.db', True)
+    kvdb = pickledb.load(PWD + '/data/gardena2influxdb/gardena2influxdb.pickle', True)
     print("Kvdb content...")
     for kv in kvdb.getall():
         print(kv, kvdb.get(kv))
