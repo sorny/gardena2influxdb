@@ -68,7 +68,7 @@ Example payload of the script which is sent to InfluxDB following a GARDENA smar
 
 Gardena2InfluxDB uses open source libs and open data to work properly:
 
-* [1689.cloud](https://developer.1689.cloud/) - Developer Portal from Husqvarna Group along documentation on GARDENA smart system and authentication API endpoints
+* [husqvarnagroup.cloud](https://developer.husqvarnagroup.cloud/) - Developer Portal from Husqvarna Group along documentation on GARDENA smart system and authentication API endpoints
 * [InfluxDB-Python](https://github.com/influxdata/influxdb-python) - Python client for InfluxDB.
 * [pickleDB](https://github.com/patx/pickledb) - lightweight and simple key-value store.
 * [docker-influxdb-grafana](https://github.com/philhawthorne/docker-influxdb-grafana) - A Docker container which runs InfluxDB and Grafana ready for persisting data.
@@ -77,7 +77,7 @@ Gardena2InfluxDB uses open source libs and open data to work properly:
 # Installation
 ## The docker-composy way of life
 #### Gardena2InfluxDB, Grafana and InfluxDB in docker
-1) Goto https://developer.1689.cloud/, sign in using your GARDENA smart system account and create a new application
+1) Goto https://developer.husqvarnagroup.cloud/, sign in using your GARDENA smart system account and create a new application
 2) Connect GARDENA smart system API and Authentication API to your application
 3) Have `docker` and `docker-compose` installed on your host
 4) Clone this repository 
@@ -91,6 +91,7 @@ $ vi settings.ini
 $ mkdir -p data
 $ mkdir -p data/influxdb
 $ mkdir -p data/grafana
+$ mkdir -p data/gardena2influxdb
 $ docker build -t gardena2influxdb .
 ```
 7) Run docker-compose to get everything up and running
@@ -102,7 +103,7 @@ $ docker-compose up
 
 ## The docker way of life
 #### Dockerized Gardena2InfluxDB
-1) Goto https://developer.1689.cloud/, sign in using your GARDENA smart system account and create a new application
+1) Goto https://developer.husqvarnagroup.cloud/, sign in using your GARDENA smart system account and create a new application
 2) Connect GARDENA smart system API and Authentication API to your application
 3) Have `docker` installed, InfluxDB is running at some place only you know ;)
 4) Clone this repository 
@@ -120,14 +121,14 @@ $ docker build -t gardena2influxdb .
 $ docker run -d \
   --name gardena2influxdb \
   -v $PWD/settings.ini:/app/settings.ini \
-  -v $PWD/gardena2influxdb.db:/app/gardena2influxdb.db \
+  -v $PWD/data/gardena2influxdb:/app/data \
   gardena2influxdb:latest
 ```
 
 
 ## The systemctl way of life
 #### Gardena2InfluxDB as a service
-1) Goto https://developer.1689.cloud/, sign in using your GARDENA smart system account and create a new application
+1) Goto https://developer.husqvarnagroup.cloud/, sign in using your GARDENA smart system account and create a new application
 2) Connect GARDENA smart system API and Authentication API to your application
 3) Clone the repository to `/etc` and install requirements
 ```sh
