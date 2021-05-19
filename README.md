@@ -133,6 +133,7 @@ $ docker run -d \
 3) Clone the repository to `/etc` and install requirements
 ```sh
 $ cd /etc/gardena2influxdb
+$ mkdir -p data/gardena2influxdb
 $ pip3 install -r requirements.txt
 ```
 4) Modify **settings.ini** & **gardena2influxdb.service** files and copy service to systemd.
