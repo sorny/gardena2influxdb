@@ -121,7 +121,7 @@ $ docker build -t gardena2influxdb .
 $ docker run -d \
   --name gardena2influxdb \
   -v $PWD/settings.ini:/app/settings.ini \
-  -v $PWD/data/gardena2influxdb:/app/data \
+  -v $PWD/data/gardena2influxdb:/app/data/gardena2influxdb \
   gardena2influxdb:latest
 ```
 
