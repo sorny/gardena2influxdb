@@ -23,7 +23,7 @@ class Client:
         self.idb = idb
         self.kvdb = kvdb
 
-    def on_message(self, message):
+    def on_message(self, ws, message):
         print("msg", message)
         sys.stdout.flush()
 
@@ -33,18 +33,20 @@ class Client:
             print("influxdata", influxdata)
             self.idb.write_points(influxdata)
 
-    def on_error(self, error):
+    def on_error(self, ws, error):
         self.live = False
+        ws.close()
         print("error", error)
         print("### exit ###")
         sys.exit(0)
 
-    def on_close(self):
+    def on_close(self, ws):
         self.live = False
+        ws.close()
         print("### closed ###")
         sys.exit(0)
 
-    def on_open(self):
+    def on_open(self, ws):
         self.live = True
         print("### connected ###")
 
