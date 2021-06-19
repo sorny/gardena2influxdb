@@ -22,7 +22,7 @@ services:
     restart: always
     volumes:
       - ./settings.ini:/app/settings.ini
-      - ./data/gardena2influxdb:/app/data
+      - ./data/gardena2influxdb:/app/data/gardena2influxdb
     depends_on:
       - tig
     command: ["wait-for-it", "tig:8086", "--", "python", "/app/gardena2influxdb.py"]
