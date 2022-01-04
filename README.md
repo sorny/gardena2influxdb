@@ -198,6 +198,11 @@ systemctl restart rsyslog
 
 After the first events will go to the InfluxDB you can create nice Grafana dashboards.
 
+### Notes
+
+ * In case the script fails to connect to the websockets, it might be due to compatibility issues with the websocket-client library around version 0.53.0. Trying upgrade to the latest version.
+
+
 Have fun !
 
 License
