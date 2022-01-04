@@ -3,7 +3,7 @@
 username = 
 password = 
 
-# Unique application key from developer.1689.cloud/apps
+# Unique application key from developer.husqvarnagroup.cloud/apps
 application_api_key = 
 
 # Endpoints for authentcation and GARDENA smart system events
