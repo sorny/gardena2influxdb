@@ -1,11 +1,12 @@
 #!/usr/bin/python3 -u
 # Parsing GARDENA smart system events and forwarding it InfluxDB
-# Gerald Reisinger 2019
+# Gerald Reisinger 2022
 
 import configparser
 import json
 import os
 import sys
+import getopt
 import time
 import traceback
 from datetime import datetime
@@ -30,8 +31,9 @@ class Client:
         # Parse and reading point as JSON data to InfluxDB
         influxdata = parse_event(message, self.kvdb)
         if influxdata:
-            print("influxdata", influxdata)
-            self.idb.write_points(influxdata)
+            if self.idb:
+                print("influxdata", influxdata)
+                self.idb.write_points(influxdata)
 
     def on_error(self, ws, error):
         self.live = False
@@ -140,6 +142,10 @@ def parse_event(message, kvdb):
 
 
 def main():
+    dry_run = '--dry-run' in sys.argv[1:]
+    if dry_run:
+        print("Dry-run enabled, only writing data to stdout...")
+
     # Preparing for reading config file
     PWD = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
     if not os.path.isfile('%s/settings.ini' % PWD):
@@ -163,14 +169,16 @@ def main():
     GARDENA_API_ENDPOINT = CONFIG.get('GARDENA', 'gardena_api_endpoint')
 
     # Setup InfluxDB client
-    idb = InfluxDBClient(INFLUX_HOST, INFLUX_PORT, INFLUX_USER, INFLUX_PASSWORD, INFLUX_DB)
+    idb = False
+    if not dry_run:
+        idb = InfluxDBClient(INFLUX_HOST, INFLUX_PORT, INFLUX_USER, INFLUX_PASSWORD, INFLUX_DB)
 
-    # Create InfluxDB db if it does not exist yet
-    try:
-        print('Create Influxdb database...')
-        idb.create_database(INFLUX_DB)
-    except influxdb.InfluxDBClientError:
-        print('Influxdb database already exists')
+        # Create InfluxDB db if it does not exist yet
+        try:
+            print('Create Influxdb database...')
+            idb.create_database(INFLUX_DB)
+        except influxdb.InfluxDBClientError:
+            print('Influxdb database already exists')
 
     # Setup key-value store
     kvdb = pickledb.load(PWD + '/data/gardena2influxdb/gardena2influxdb.pickle', True)
@@ -203,6 +211,10 @@ def main():
     }
 
     r = requests.get(f'{GARDENA_API_ENDPOINT}/v1/locations', headers=headers)
+    if r.status_code == 401:
+        print('Unauthorized to access smart system API...)')
+        print('Renew your API key and ensure app is connected to GARDENA smart '
+              'system API')
     assert r.status_code == 200, r
     assert len(r.json()["data"]) > 0, 'location missing - user has not setup system'
     location_id = r.json()["data"][0]["id"]
