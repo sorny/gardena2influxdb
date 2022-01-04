@@ -1,5 +1,5 @@
 # Gardena2InfluxDB
-### Version 0.3
+### Version 0.3.1
 ![Alt text](https://github.com/sorny/gardena2influxdb/blob/master/gardena2influxdb.png?raw=true "Grafana dashboard example")
 
 Gardena2InfluxDB is a Python script for parsing events received on a GARDENA smart system websocket. 
@@ -75,6 +75,28 @@ Gardena2InfluxDB uses open source libs and open data to work properly:
 
 
 # Installation
+
+## The local dry-run way of life
+#### Gardena2InfluxDB locally in a dry-run
+1) Goto https://developer.husqvarnagroup.cloud/, sign in using your GARDENA smart system account and create a new application
+2) Connect GARDENA smart system API and Authentication API to your application
+3) Have `python3` and `pip3` installed, no InfluxDB is involved thus dry-run
+4) Clone this repository 
+5) Modify **settings.ini** files and fill in your GARDENA credentials and API key
+```sh
+$ cp settings.ini.bak settings.ini
+$ vi settings.ini
+```
+6) Install the requirements
+```sh
+$ pip3 install -r requirements.txt
+```
+7) Dry-run the gardena2influxdb python script
+```sh
+$ python3 gardena2influxdb.py --dry-run
+```
+
+
 ## The docker-composy way of life
 #### Gardena2InfluxDB, Grafana and InfluxDB in docker
 1) Goto https://developer.husqvarnagroup.cloud/, sign in using your GARDENA smart system account and create a new application
@@ -88,10 +110,10 @@ $ vi settings.ini
 ```
 6) Build the gardena2influxdb docker image and create some necessary data dirs to add persistency to your collected data
 ```sh
-$ mkdir -p data
-$ mkdir -p data/influxdb
-$ mkdir -p data/grafana
-$ mkdir -p data/gardena2influxdb
+$ mkdir data
+$ mkdir data/influxdb
+$ mkdir data/grafana
+$ mkdir data/gardena2influxdb
 $ docker build -t gardena2influxdb .
 ```
 7) Run docker-compose to get everything up and running
