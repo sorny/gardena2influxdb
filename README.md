@@ -121,6 +121,7 @@ $ docker build -t gardena2influxdb .
 $ docker-compose up
 ```
 8) Enjoy Grafana at http://localhost:3003
+9) Details regarding login, how to add InfluxDB as a datasource etc. can be found over here: https://github.com/philhawthorne/docker-influxdb-grafana
 
 
 ## The docker way of life
